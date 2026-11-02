@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fleur — Цветы с доставкой</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/e45a5f63-af51-46c0-899f-f87cb27d12df_1" />
+<link rel="shortcut icon" href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/e45a5f63-af51-46c0-899f-f87cb27d12df_1" />
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/e45a5f63-af51-46c0-899f-f87cb27d12df_1" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@5.0.13/index.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/index.css" />
+<style>
+  :root {
+    --bg: #FBF6EF; --bg-soft: #F5EDE3; --accent: #E8C4C4; --accent-deep: #D4A5A5;
+    --sage: #C8D5B9; --sage-deep: #A8B89A; --beige: #E8DCC8; --text: #3D2E2E;
+    --text-soft: #7A6A6A; --white: #FFFFFF; --header-height: 90px; --bar-height: 56px;
+    --success: #8FB996; --warning: #E8B87D; --error: #D47A7A; --yookassa: #6C5CE7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+  h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; font-weight: 400; letter-spacing: 0.01em; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  .hero .logo, .hero-logo, .hero-watermark, .hero .hero-logo-watermark { display: none !important; }
+
+  .menu-toggle { position: fixed; top: 28px; left: 20px; z-index: 1002; background: transparent; border: none; padding: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .menu-toggle-text { font-family: 'Inter', sans-serif; font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text); font-weight: 500; }
+  .menu-toggle-icon { display: flex; flex-direction: column; gap: 4px; }
+  .menu-toggle-icon span { display: block; width: 22px; height: 2px; background: var(--text); }
+  .menu-toggle:hover .menu-toggle-text { color: var(--accent-deep); }
+
+  .menu-drawer { position: fixed; top: 0; left: -100%; width: 320px; max-width: 85vw; height: 100vh; background: var(--bg); z-index: 999; padding: 80px 30px 30px; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; box-shadow: 2px 0 20px rgba(61, 46, 46, 0.1); }
+  .menu-drawer.open { left: 0; }
+  .menu-overlay { position: fixed; inset: 0; background: rgba(61, 46, 46, 0.5); z-index: 998; opacity: 0; visibility: hidden; transition: all 0.3s; }
+  .menu-overlay.open { opacity: 1; visibility: visible; }
+  .menu-brand { font-family: 'Cormorant Garamond', serif; font-size: 32px; letter-spacing: 0.15em; color: var(--text); margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--accent); }
+  .menu-item { margin-bottom: 8px; }
+  .menu-link { display: block; padding: 14px 16px; color: var(--text); text-decoration: none; font-size: 16px; letter-spacing: 0.05em; border-radius: 8px; transition: all 0.3s; cursor: pointer; }
+  .menu-link:hover { background: var(--bg-soft); color: var(--accent-deep); }
+  .menu-submenu { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; margin-left: 16px; }
+  .menu-submenu.open { max-height: 500px; }
+  .menu-submenu .menu-link { padding: 10px 16px; font-size: 14px; color: var(--text-soft); }
+  .menu-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 28px; color: var(--text); cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .menu-close:hover { background: var(--bg-soft); }
+
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-soft); height: var(--header-height); }
+  .nav { display: flex; justify-content: center; align-items: center; padding: 0 24px; max-width: 100%; margin: 0 auto; position: relative; height: 100%; }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 48px; letter-spacing: 0.08em; color: var(--text); font-weight: 500; }
+  .logo span { color: var(--accent-deep); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { color: var(--text); text-decoration: none; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.3s; position: relative; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--accent-deep); transition: width 0.3s; }
+  .nav-links a:hover { color: var(--accent-deep); }
+  .nav-links a:hover::after { width: 100%; }
+  
+  .cart-icon-btn { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; padding: 10px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+  .cart-icon-btn:hover { transform: translateY(-50%) scale(1.1); }
+  .cart-icon-btn svg { width: 26px; height: 26px; color: var(--text); }
+  .cart-badge { position: absolute; top: 2px; right: 2px; background: var(--accent-deep); color: var(--white); font-size: 11px; font-weight: 600; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 5px; font-family: 'Inter', sans-serif; }
+  .cart-badge.hidden { display: none; }
+  
+  @media (max-width: 720px) { .nav-links { display: none; } .logo { font-size: 40px; } }
+
+  .category-bar { position: fixed; top: var(--header-height); left: 0; right: 0; z-index: 99; background: var(--bg-soft); border-bottom: 1px solid rgba(61, 46, 46, 0.08); padding: 10px 0; }
+  .category-bar-inner { display: flex; gap: 10px; overflow-x: auto; padding: 0 24px; max-width: 1200px; margin: 0 auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .category-bar-inner::-webkit-scrollbar { display: none; }
+  .cat-pill { flex-shrink: 0; padding: 10px 24px; background: var(--white); border: 1px solid transparent; border-radius: 30px; font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.1em; color: var(--text); cursor: pointer; transition: all 0.3s; white-space: nowrap; text-transform: uppercase; font-weight: 500; box-shadow: 0 2px 8px rgba(61, 46, 46, 0.06); }
+  .cat-pill:hover { background: var(--accent); color: var(--white); }
+  .cat-pill.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+  .line-break { display: none; }
+
+  .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; padding-top: calc(var(--header-height) + var(--bar-height) + 40px); padding-bottom: 80px; overflow: hidden; text-align: center; }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; }
+  .hero-bg::before { content: ''; position: absolute; top: -10%; right: -10%; width: 60%; height: 80%; background: radial-gradient(circle, var(--accent) 0%, transparent 70%); opacity: 0.4; filter: blur(60px); }
+  .hero-bg::after { content: ''; position: absolute; bottom: -10%; left: -10%; width: 50%; height: 70%; background: radial-gradient(circle, var(--sage) 0%, transparent 70%); opacity: 0.35; filter: blur(60px); }
+  .hero-text { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+  .hero-text .eyebrow { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 24px; }
+  .hero-text h1 { font-size: clamp(42px, 7vw, 88px); line-height: 1.05; margin-bottom: 28px; color: var(--text); }
+  .hero-text h1 em { font-style: italic; color: var(--accent-deep); font-weight: 300; }
+  .hero-text p { font-size: 18px; color: var(--text-soft); max-width: 500px; margin: 0 auto 20px; }
+  .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  
+  .btn { display: inline-block; padding: 18px 40px; background: var(--text); color: var(--bg); border: none; border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.4s; }
+  .btn:hover { background: var(--accent-deep); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(212, 165, 165, 0.35); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-outline { display: inline-block; padding: 18px 40px; background: transparent; color: var(--text); border: 1px solid var(--text); border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.4s; }
+  .btn-outline:hover { background: var(--text); color: var(--bg); }
+  .btn-yookassa { display: inline-block; padding: 18px 40px; background: var(--yookassa); color: var(--white); border: none; border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.4s; font-weight: 600; }
+  .btn-yookassa:hover { background: #5a4bd6; transform: translateY(-2px); box-shadow: 0 12px 30px rgba(108, 92, 231, 0.4); }
+  .btn-yookassa:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .slider-section { padding: 60px 0 100px; background: var(--bg); position: relative; }
+  .slider-label { text-align: center; margin-bottom: 30px; font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.12em; color: var(--text); text-transform: uppercase; }
+  .slider-label span { display: inline-flex; align-items: center; gap: 12px; padding: 16px 36px; background: var(--accent); color: var(--white); border-radius: 50px; box-shadow: 0 8px 28px rgba(212, 165, 165, 0.55); font-weight: 700; letter-spacing: 0.1em; }
+
+  .hero-slider { position: relative; width: 100%; height: 650px; }
+  .slider-container { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 24px; }
+  .slider-track { display: flex; gap: 20px; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; padding: 0 20px; }
+  .slide { min-width: 360px; max-width: 360px; height: 100%; flex-shrink: 0; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 40px rgba(61, 46, 46, 0.18); transition: transform 0.3s; }
+  .slide:hover { transform: translateY(-5px); }
+  .slide svg { width: 100%; height: 100%; display: block; }
+  .slide svg image { width: 100%; height: 100%; object-fit: cover; }
+  .slider-dots { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(61, 46, 46, 0.3); cursor: pointer; transition: all 0.3s; }
+  .dot.active { background: var(--text); transform: scale(1.3); }
+  .slider-arrows { position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: space-between; padding: 0 10px; z-index: 10; pointer-events: none; }
+  .slider-arrow { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.95); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; pointer-events: all; transition: all 0.3s; box-shadow: 0 4px 15px rgba(61, 46, 46, 0.2); }
+  .slider-arrow:hover { background: var(--white); transform: scale(1.1); }
+
+  @media (max-width: 900px) { .hero-slider { height: 520px; } .slide { min-width: 300px; max-width: 300px; } .slider-label { font-size: 18px; } .slider-label span { padding: 14px 28px; } }
+  @media (max-width: 560px) {
+    .hero-slider { height: 460px; } .slide { min-width: 85vw; max-width: 85vw; } .slider-track { padding: 0 10px; }
+    .nav { justify-content: center; padding: 0 16px; }
+    .logo { font-size: 32px; position: absolute; left: 16px; top: 50%; transform: translateY(-50%); margin: 0; }
+    .cart-icon-btn { position: absolute; right: 60px; top: 50%; transform: translateY(-50%); padding: 8px; }
+    .cart-icon-btn:hover { transform: translateY(-50%) scale(1.1); }
+    .menu-toggle { position: fixed; left: auto; right: 12px; top: 0; height: var(--header-height); transform: none; padding: 8px 10px; z-index: 1002; }
+    .menu-toggle-text { display: none; } .menu-toggle-icon span { width: 24px; height: 2px; }
+    .line-break { display: block; }
+    .hero-text h1 { font-size: 32px; line-height: 1.15; margin-bottom: 16px; }
+    .hero-text p { font-size: 14px; line-height: 1.5; margin-bottom: 16px; }
+    .hero-text .eyebrow { font-size: 10px; margin-bottom: 12px; }
+    .hero-buttons { flex-direction: column; align-items: center; gap: 12px; }
+    .btn, .btn-outline, .btn-yookassa { display: block; width: 100%; max-width: 280px; padding: 14px 24px; font-size: 12px; text-align: center; }
+    .hero { min-height: auto; padding-bottom: 20px; }
+    .slider-section { padding: 10px 0 60px; }
+    .slider-label { font-size: 14px; margin-bottom: 20px; }
+    .slider-label span { padding: 12px 24px; font-size: 14px; }
+  }
+
+  section { padding: 100px 0; }
+  .section-header { text-align: center; margin-bottom: 70px; }
+  .section-header .eyebrow { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 16px; }
+  .section-header h2 { font-size: clamp(36px, 5vw, 60px); line-height: 1.1; margin-bottom: 20px; }
+  .section-header h2 em { font-style: italic; color: var(--accent-deep); }
+  .section-header p { font-size: 17px; color: var(--text-soft); max-width: 560px; margin: 0 auto; }
+
+  .services { background: var(--bg-soft); }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  .service-card { background: var(--bg); padding: 48px 36px; border-radius: 24px; text-align: center; transition: all 0.4s; border: 1px solid transparent; }
+  .service-card:hover { transform: translateY(-8px); box-shadow: 0 30px 60px -20px rgba(61, 46, 46, 0.15); border-color: var(--accent); }
+  .service-icon { width: 80px; height: 80px; margin: 0 auto 28px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); }
+  .service-icon svg { width: 36px; height: 36px; }
+  .service-card h3 { font-size: 28px; margin-bottom: 14px; }
+  .service-card p { color: var(--text-soft); font-size: 15px; }
+  @media (max-width: 900px) { .services-grid { grid-template-columns: 1fr; gap: 20px; } .service-card { padding: 36px 28px; } }
+
+  .catalog { background: var(--bg); }
+  .catalog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  .catalog-item { background: var(--bg); border-radius: 20px; overflow: hidden; transition: all 0.4s; cursor: pointer; }
+  .catalog-item:hover { transform: translateY(-6px); box-shadow: 0 30px 60px -20px rgba(61, 46, 46, 0.2); }
+  .catalog-image { aspect-ratio: 1; overflow: hidden; background: var(--bg-soft); position: relative; }
+  .catalog-image svg { width: 100%; height: 100%; display: block; }
+  .catalog-image svg image { transition: transform 0.6s; }
+  .catalog-item:hover .catalog-image svg image { transform: scale(1.08); transform-origin: center; }
+  .catalog-info { padding: 24px 24px 28px; }
+  .catalog-info h3 { font-size: 24px; margin-bottom: 8px; }
+  .catalog-info .desc { color: var(--text-soft); font-size: 14px; margin-bottom: 16px; min-height: 42px; }
+  .catalog-bottom { display: flex; justify-content: space-between; align-items: center; }
+  .price { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--text); font-weight: 500; }
+  .add-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); border: none; color: var(--white); font-size: 22px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+  .add-btn:hover { background: var(--accent-deep); transform: rotate(90deg); }
+  .add-btn.in-cart { background: var(--sage-deep); }
+  @media (max-width: 900px) { .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+  @media (max-width: 560px) { .catalog-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } .catalog-info { padding: 18px 16px 22px; } .catalog-info h3 { font-size: 18px; } .catalog-info .desc { font-size: 12px; min-height: 35px; } .price { font-size: 20px; } .add-btn { width: 36px; height: 36px; font-size: 18px; } }
+
+  .contacts { background: var(--bg-soft); }
+  .contacts-wrap { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: start; }
+  .contacts-info h2 { font-size: clamp(36px, 5vw, 56px); line-height: 1.1; margin-bottom: 24px; }
+  .contacts-info h2 em { font-style: italic; color: var(--accent-deep); }
+  .contacts-info > p { color: var(--text-soft); font-size: 16px; margin-bottom: 36px; }
+  .contact-item { display: flex; align-items: center; gap: 18px; margin-bottom: 22px; }
+  .contact-icon { width: 50px; height: 50px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-deep); flex-shrink: 0; overflow: hidden; }
+  .contact-icon svg { width: 22px; height: 22px; }
+  .contact-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .contact-item-text .label { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 4px; }
+  .contact-item-text .value { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--text); }
+  .socials { display: flex; gap: 12px; margin-top: 32px; }
+  .socials a { width: 44px; height: 44px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--text); transition: all 0.3s; overflow: hidden; }
+  .socials a:hover { background: var(--accent); color: var(--white); transform: translateY(-3px); }
+  .socials a img { width: 100%; height: 100%; object-fit: cover; }
+
+  .form-card { background: var(--bg); padding: 44px; border-radius: 24px; box-shadow: 0 20px 50px -20px rgba(61, 46, 46, 0.12); }
+  .form-card h3 { font-size: 32px; margin-bottom: 8px; }
+  .form-card > p { color: var(--text-soft); font-size: 15px; margin-bottom: 28px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 8px; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 14px 18px; background: var(--bg-soft); border: 1px solid transparent; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--text); transition: all 0.3s; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); background: var(--bg); }
+  .form-group input.error, .form-group textarea.error, .form-group select.error { border-color: var(--error); background: #FFF5F5; }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .form-card .btn { width: 100%; margin-top: 8px; }
+  .form-success { display: none; text-align: center; padding: 30px 20px; }
+  .form-success.show { display: block; }
+  .form-success-icon { width: 70px; height: 70px; margin: 0 auto 20px; background: var(--sage); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 32px; }
+  .form-success h4 { font-size: 28px; margin-bottom: 10px; }
+  .form-success p { color: var(--text-soft); }
+  .error-message { color: var(--error); font-size: 12px; margin-top: 6px; display: none; }
+  .error-message.show { display: block; }
+  @media (max-width: 900px) { .contacts-wrap { grid-template-columns: 1fr; gap: 40px; } .form-card { padding: 32px 24px; } }
+
+  footer { background: var(--text); color: var(--bg); padding: 40px 0; text-align: center; }
+  footer .logo { color: var(--bg); margin-bottom: 12px; }
+  footer p { font-size: 13px; color: rgba(251, 246, 239, 0.6); letter-spacing: 0.05em; }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  @media (max-width: 560px) { section { padding: 70px 0; } .section-header { margin-bottom: 50px; } }
+
+  .about-hero { min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, var(--bg-soft) 0%, var(--accent) 100%); padding: 120px 24px 80px; }
+  .about-hero h1 { font-size: clamp(36px, 6vw, 72px); margin-bottom: 20px; }
+  .about-hero p { font-size: 18px; color: var(--text-soft); max-width: 600px; margin: 0 auto; }
+  .about-section { padding: 80px 0; }
+  .about-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 50px; }
+  .about-item { border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(61, 46, 46, 0.1); }
+  .about-item svg { width: 100%; height: auto; display: block; }
+  .about-text { padding: 30px; background: var(--bg); }
+  .about-text h3 { font-size: 24px; margin-bottom: 12px; }
+  .about-text p { color: var(--text-soft); line-height: 1.8; }
+  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .about-hero { min-height: 50vh; padding: 100px 20px 60px; } }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(61, 46, 46, 0.6); backdrop-filter: blur(4px); z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { opacity: 1; visibility: visible; }
+  .modal { background: var(--bg); border-radius: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 36px; position: relative; transform: translateY(20px); transition: transform 0.3s; }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: var(--bg-soft); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; color: var(--text); display: flex; align-items: center; justify-content: center; transition: all 0.3s; z-index: 2; }
+  .modal-close:hover { background: var(--accent); color: var(--white); }
+  .modal h3 { font-size: 28px; margin-bottom: 8px; }
+  .modal > p { color: var(--text-soft); margin-bottom: 24px; font-size: 14px; }
+
+  .cart-items { margin-bottom: 24px; }
+  .cart-item { display: flex; gap: 16px; padding: 16px; background: var(--bg-soft); border-radius: 16px; margin-bottom: 12px; align-items: center; }
+  .cart-item-img { width: 70px; height: 70px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: var(--bg); }
+  .cart-item-img svg { width: 100%; height: 100%; }
+  .cart-item-img svg image { width: 100%; height: 100%; object-fit: cover; }
+  .cart-item-info { flex: 1; min-width: 0; }
+  .cart-item-info h4 { font-size: 18px; margin-bottom: 4px; }
+  .cart-item-info .cart-item-price { color: var(--accent-deep); font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; }
+  .cart-item-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .qty-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--white); border: 1px solid var(--bg-soft); cursor: pointer; font-size: 16px; color: var(--text); display: flex; align-items: center; justify-content: center; transition: all 0.3s; flex-shrink: 0; }
+  .qty-btn:hover { background: var(--accent); color: var(--white); border-color: var(--accent); }
+  .qty-value { font-weight: 600; min-width: 24px; text-align: center; }
+  .cart-remove { background: none; border: none; color: var(--text-soft); cursor: pointer; font-size: 18px; padding: 4px 8px; transition: color 0.3s; }
+  .cart-remove:hover { color: var(--error); }
+  .cart-empty { text-align: center; padding: 40px 20px; color: var(--text-soft); }
+  .cart-empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+  .cart-total { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-top: 1px solid var(--bg-soft); margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+  .cart-total-label { font-size: 16px; color: var(--text-soft); }
+  .cart-total-value { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: var(--text); white-space: nowrap; }
+  .cart-note { background: var(--bg-soft); padding: 12px 16px; border-radius: 12px; font-size: 13px; color: var(--text-soft); margin-bottom: 20px; border-left: 3px solid var(--accent); }
+
+  .checkout-steps { display: flex; gap: 8px; margin-bottom: 24px; }
+  .checkout-step { flex: 1; height: 4px; background: var(--bg-soft); border-radius: 2px; transition: background 0.3s; }
+  .checkout-step.active { background: var(--accent-deep); }
+  .checkout-step.done { background: var(--sage); }
+  .checkout-section { display: none; }
+  .checkout-section.active { display: block; }
+  .checkout-section h4 { font-size: 22px; margin-bottom: 16px; color: var(--text); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .checkbox-group { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; background: var(--bg-soft); border-radius: 12px; margin-top: 8px; cursor: pointer; }
+  .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent-deep); flex-shrink: 0; }
+  .checkbox-group label { font-size: 13px; color: var(--text-soft); cursor: pointer; text-transform: none; letter-spacing: normal; margin: 0; line-height: 1.4; }
+  .delivery-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .delivery-option { padding: 16px; background: var(--bg-soft); border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: all 0.3s; text-align: center; }
+  .delivery-option:hover { border-color: var(--accent); }
+  .delivery-option.selected { border-color: var(--accent-deep); background: var(--white); }
+  .delivery-option-icon { font-size: 24px; margin-bottom: 8px; }
+  .delivery-option-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .delivery-option-desc { font-size: 12px; color: var(--text-soft); }
+  .messenger-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .messenger-option { padding: 16px 8px; background: var(--bg-soft); border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: all 0.3s; text-align: center; }
+  .messenger-option:hover { border-color: var(--accent); }
+  .messenger-option.selected { border-color: var(--accent-deep); background: var(--white); }
+  .messenger-option-icon { font-size: 24px; margin-bottom: 8px; }
+  .messenger-option-title { font-weight: 600; font-size: 14px; }
+  .order-summary { background: var(--bg-soft); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+  .order-summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; gap: 12px; flex-wrap: wrap; }
+  .order-summary-row.total { border-top: 1px solid var(--accent); margin-top: 8px; padding-top: 12px; font-weight: 600; font-size: 16px; }
+  .order-summary-row .label { color: var(--text-soft); }
+  .order-summary-row .value { color: var(--text); font-weight: 500; white-space: nowrap; }
+  .order-success-icon { width: 80px; height: 80px; margin: 0 auto 20px; background: var(--sage); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 40px; }
+  .order-number { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--accent-deep); text-align: center; margin-bottom: 8px; word-break: break-all; }
+  .order-status-badge { display: inline-block; padding: 6px 16px; background: var(--warning); color: var(--white); border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; }
+  .order-status-badge.paid { background: var(--success); }
+  .messenger-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+  .messenger-btn { padding: 14px 8px; border-radius: 12px; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--white); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; min-width: 0; }
+  .messenger-btn.telegram { background: #2AABEE; }
+  .messenger-btn.whatsapp { background: #25D366; }
+  .messenger-btn.max { background: #0077FF; }
+  .messenger-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+  .copy-btn { width: 100%; padding: 14px; background: var(--bg-soft); border: 1px solid var(--accent); border-radius: 12px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); transition: all 0.3s; margin-bottom: 12px; }
+  .copy-btn:hover { background: var(--accent); color: var(--white); }
+  .copy-btn.copied { background: var(--sage); color: var(--white); border-color: var(--sage); }
+  .hint-box { background: var(--bg-soft); border-left: 4px solid var(--accent-deep); padding: 16px 20px; border-radius: 8px; margin: 20px 0; font-size: 14px; color: var(--text-soft); }
+  .hint-box strong { color: var(--text); }
+  .next-steps { background: var(--bg-soft); border-radius: 16px; padding: 20px; margin: 20px 0; }
+  .next-steps h4 { font-size: 18px; margin-bottom: 12px; }
+  .next-steps ol { padding-left: 20px; color: var(--text-soft); font-size: 14px; }
+  .next-steps li { margin-bottom: 8px; }
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: var(--bg); padding: 14px 24px; border-radius: 30px; font-size: 14px; z-index: 3000; opacity: 0; transition: all 0.3s; box-shadow: 0 10px 30px rgba(61, 46, 46, 0.3); max-width: 90vw; text-align: center; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--error); }
+  .toast.success { background: var(--success); }
+
+  @media (max-width: 560px) {
+    .modal { padding: 24px 20px; border-radius: 20px; max-height: 95vh; }
+    .modal h3 { font-size: 22px; margin-bottom: 6px; }
+    .modal > p { font-size: 13px; margin-bottom: 18px; }
+    .checkout-section h4 { font-size: 18px; margin-bottom: 12px; }
+    .form-row { grid-template-columns: 1fr; gap: 12px; }
+    .form-group input, .form-group textarea, .form-group select { padding: 12px 14px; font-size: 14px; }
+    .form-group label { font-size: 11px; }
+    .delivery-options { grid-template-columns: 1fr; gap: 10px; }
+    .delivery-option { padding: 14px; }
+    .messenger-options { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .messenger-option { padding: 12px 6px; }
+    .messenger-option-icon { font-size: 20px; margin-bottom: 4px; }
+    .messenger-option-title { font-size: 12px; }
+    .checkout-steps { gap: 6px; margin-bottom: 18px; }
+    .cart-item { padding: 12px; gap: 10px; flex-wrap: wrap; }
+    .cart-item-img { width: 60px; height: 60px; }
+    .cart-item-info { flex: 1; min-width: calc(100% - 80px); }
+    .cart-item-info h4 { font-size: 14px; margin-bottom: 2px; }
+    .cart-item-info .cart-item-price { font-size: 14px; }
+    .cart-item-controls { width: 100%; justify-content: flex-end; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--bg); }
+    .qty-btn { width: 28px; height: 28px; font-size: 14px; }
+    .cart-total { padding: 14px 0; }
+    .cart-total-label { font-size: 14px; }
+    .cart-total-value { font-size: 22px; }
+    .btn, .btn-outline, .btn-yookassa { padding: 14px 20px; font-size: 12px; letter-spacing: 0.1em; }
+    .order-summary { padding: 14px; }
+    .order-summary-row { font-size: 13px; padding: 6px 0; }
+    .order-summary-row.total { font-size: 14px; }
+    .order-number { font-size: 24px; }
+    .messenger-buttons { grid-template-columns: 1fr; gap: 10px; }
+    .messenger-btn { padding: 14px; font-size: 14px; }
+    .hint-box { padding: 12px 14px; font-size: 13px; }
+    .next-steps { padding: 14px; }
+    .next-steps h4 { font-size: 16px; }
+    .next-steps ol { font-size: 13px; }
+    .copy-btn { padding: 12px; font-size: 13px; }
+    .checkbox-group { padding: 10px 12px; }
+    .checkbox-group label { font-size: 12px; }
+    .cart-note { padding: 10px 12px; font-size: 12px; }
+  }
+  @media (max-width: 380px) { .modal { padding: 18px 14px; } .modal h3 { font-size: 20px; } .messenger-option-title { font-size: 11px; } .messenger-option-icon { font-size: 18px; } }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="toggleMenu()">
+  <div class="menu-toggle-icon"><span></span><span></span><span></span></div>
+  <span class="menu-toggle-text">Меню</span>
+</button>
+<div class="menu-overlay" onclick="toggleMenu()"></div>
+
+<div class="menu-drawer" id="menuDrawer">
+  <button class="menu-close" onclick="toggleMenu()">×</button>
+  <div class="menu-brand">FLEUR.</div>
+  <div class="menu-item"><a href="#" class="menu-link" onclick="showPage('home'); toggleMenu();">Главная</a></div>
+  <div class="menu-item">
+    <div class="menu-link" onclick="toggleSubmenu('catalogSubmenu')">Каталог букетов</div>
+    <div class="menu-submenu" id="catalogSubmenu">
+      <a href="#" class="menu-link" onclick="scrollToCategory('popular'); toggleMenu();">Популярные товары</a>
+      <a href="#" class="menu-link" onclick="scrollToCategory('composite'); toggleMenu();">Составные букеты</a>
+      <a href="#" class="menu-link" onclick="scrollToCategory('mono'); toggleMenu();">Монобукеты</a>
+      <a href="#" class="menu-link" onclick="scrollToCategory('wow'); toggleMenu();">Букеты с вау эффектом</a>
+      <a href="#" class="menu-link" onclick="scrollToCategory('composition'); toggleMenu();">Композиции</a>
+      <a href="#" class="menu-link" onclick="scrollToCategory('compliment'); toggleMenu();">Букеты комплименты</a>
+      <a href="#" class="menu-link" onclick="scrollToCategory('wedding'); toggleMenu();">Свадебные букеты</a>
+    </div>
+  </div>
+  <div class="menu-item"><a href="#" class="menu-link" onclick="showPage('about'); toggleMenu();">О нас</a></div>
+  <div class="menu-item"><a href="#contacts" class="menu-link" onclick="scrollToContacts(); toggleMenu();">Контакты</a></div>
+  <div class="menu-item"><a href="#" class="menu-link" onclick="openCart(); toggleMenu();">Корзина (<span class="cart-count-menu">0</span>)</a></div>
+</div>
+
+<header>
+  <nav class="nav">
+    <div class="logo">FLEUR<span>.</span></div>
+    <ul class="nav-links">
+      <li><a href="#services">Услуги</a></li>
+      <li><a href="#catalog">Каталог</a></li>
+      <li><a href="#contacts">Контакты</a></li>
+    </ul>
+    <button class="cart-icon-btn" onclick="openCart()" aria-label="Корзина">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      <span class="cart-badge hidden" id="cartBadge">0</span>
+    </button>
+  </nav>
+</header>
+
+<div class="category-bar">
+  <div class="category-bar-inner">
+    <button class="cat-pill active" data-target="popular">Популярное</button>
+    <button class="cat-pill" data-target="composite">Составные букеты</button>
+    <button class="cat-pill" data-target="mono">Монобукеты</button>
+    <button class="cat-pill" data-target="wow">Вау эффект</button>
+    <button class="cat-pill" data-target="composition">Композиции</button>
+    <button class="cat-pill" data-target="compliment">Комплименты</button>
+    <button class="cat-pill" data-target="wedding">Свадебные</button>
+  </div>
+</div>
+
+<div id="homePage">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero-text reveal">
+        <div class="eyebrow">Модный бутик цветов</div>
+        <h1>Цветы, которые<span class="line-break"></span> <em>говорят</em> за вас</h1>
+        <p>Авторские букеты, каждый букет-<span class="line-break"></span> маленькое произведение искусства.</p>
+        <div class="hero-buttons">
+          <a href="#contacts" class="btn">Написать мне</a>
+          <a href="#catalog" class="btn-outline">Смотреть каталог</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slider-section">
+    <div class="container">
+      <div class="slider-label"><span>Оформление доставки осуществляется через менеджера</span></div>
+      <div class="hero-slider reveal">
+        <div class="slider-container">
+          <div class="slider-track" id="sliderTrack">
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl1"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl1)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655752_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl2"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl2)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655753_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl3"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl3)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655754_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl4"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl4)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655755_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl5"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl5)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655756_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl6"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl6)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655757_120" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl7"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl7)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655758_120" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl8"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl8)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655759_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl9"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl9)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655760_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+            <div class="slide"><svg viewBox="0 0 360 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="sl10"><rect width="360" height="650"/></clipPath></defs><g clip-path="url(#sl10)"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655761_121" width="360" height="650" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+          </div>
+        </div>
+        <div class="slider-dots" id="sliderDots"></div>
+        <div class="slider-arrows">
+          <button class="slider-arrow" onclick="prevSlide()">‹</button>
+          <button class="slider-arrow" onclick="nextSlide()">›</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="eyebrow">Что я делаю</div>
+        <h2>Три направления <em>моей работы</em></h2>
+        <p>От нежного монобукета до полного цветочного оформления события — создаю красоту с душой</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C9 6 6 8 6 12a6 6 0 0 0 12 0c0-4-3-6-6-10z"/><path d="M12 12v10"/></svg></div>
+          <h3>Авторские букеты</h3>
+          <p>Собираю уникальные композиции из свежих сезонных цветов. Каждый букет — отражение вашего настроения и повода.</p>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-icon" style="background: var(--sage-deep);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h13l3-6h3v10H3z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></div>
+          <h3>Доставка по городу</h3>
+          <p>Бережно доставляем букеты в специальных термобоксах. Курьер привезёт цветы точно ко времени — surprise будет идеальным.</p>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-icon" style="background: var(--beige); color: var(--text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 20 12 16.5 6.5 20 8 13.5 3 9l6.5-.5z"/></svg></div>
+          <h3>Оформление событий</h3>
+          <p>Свадьбы, дни рождения, фотосессии — создаю цветочные истории, которые превращают обычные моменты в волшебные.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="catalog" id="catalog">
+    <div class="container">
+      <div class="section-header reveal" id="popular"><div class="eyebrow">Каталог</div><h2>Популярные <em>товары</em></h2><p>Самые востребованные букеты этой недели</p></div>
+      <div class="catalog-grid reveal" id="popularGrid"></div>
+      <div class="section-header reveal" style="margin-top: 100px;" id="composite"><h2>Составные <em>букеты</em></h2><p>Изысканные композиции из разных видов цветов</p></div>
+      <div class="catalog-grid reveal" id="compositeGrid"></div>
+      <div class="section-header reveal" style="margin-top: 100px;" id="mono"><h2>Монобукеты</h2><p>Элегантность в простоте — один вид цветов</p></div>
+      <div class="catalog-grid reveal" id="monoGrid"></div>
+      <div class="section-header reveal" style="margin-top: 100px;" id="wow"><h2>Букеты с <em>вау эффектом</em></h2><p>Премиум композиции для особых случаев</p></div>
+      <div class="catalog-grid reveal" id="wowGrid"></div>
+      <div class="section-header reveal" style="margin-top: 100px;" id="composition"><h2>Композиции</h2><p>Цветы в коробках, корзинах и кашпо</p></div>
+      <div class="catalog-grid reveal" id="compositionGrid"></div>
+      <div class="section-header reveal" style="margin-top: 100px;" id="compliment"><h2>Букеты <em>комплименты</em></h2><p>Милые знаки внимания по доступной цене</p></div>
+      <div class="catalog-grid reveal" id="complimentGrid"></div>
+      <div class="section-header reveal" style="margin-top: 100px;" id="wedding"><h2>Свадебные <em>букеты</em></h2><p>Идеальные букеты для самого важного дня</p></div>
+      <div class="catalog-grid reveal" id="weddingGrid"></div>
+    </div>
+  </section>
+
+  <section class="contacts" id="contacts">
+    <div class="container">
+      <div class="contacts-wrap">
+        <div class="contacts-info reveal">
+          <div class="eyebrow" style="font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 16px;">Связаться</div>
+          <h2>Давайте создадим <em>ваш букет</em></h2>
+          <p>Напишите мне — помогу выбрать идеальную композицию, рассчитаю стоимость и организую доставку в удобное время.</p>
+          <div class="contact-item"><div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg></div><div class="contact-item-text"><div class="label">Телефон</div><div class="value">+7 (999) 123-45-67</div></div></div>
+          <div class="contact-item"><div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="contact-item-text"><div class="label">Email</div><div class="value">hello@fleur.ru</div></div></div>
+          <div class="contact-item"><div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="contact-item-text"><div class="label">Адрес бутика</div><div class="value">ул. Цветочная, 12</div></div></div>
+          <div class="socials">
+            <a href="#" aria-label="Telegram"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-1.86 8.77c-.14.62-.51.77-.93.48l-2.85-2.1-1.37 1.32c-.15.15-.28.28-.57.28l.2-2.88 5.25-4.74c.23-.2-.05-.32-.35-.12L8.07 13.3l-2.8-.88c-.61-.19-.62-.61.13-.9l10.95-4.22c.51-.19.96.12.79.86z"/></svg></a>
+            <a href="#" aria-label="MAX"><img src="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/images" alt="MAX" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" /></a>
+            <a href="#" aria-label="WhatsApp"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          </div>
+        </div>
+        <div class="form-card reveal">
+          <div id="form-content">
+            <h3>Оставить заявку</h3>
+            <p>Заполните форму, и я свяжусь с вами в течение 15 минут</p>
+            <form id="order-form">
+              <div class="form-group"><label for="name">Ваше имя</label><input type="text" id="name" name="name" required placeholder="Анна" /><div class="error-message" id="name-error">Введите корректное имя (минимум 2 буквы)</div></div>
+              <div class="form-group"><label for="phone">Телефон</label><input type="tel" id="phone" name="phone" required placeholder="+7 (___) ___-__-__" /><div class="error-message" id="phone-error">Введите полный номер телефона</div></div>
+              <div class="form-group"><label for="message">Сообщение</label><textarea id="message" name="message" placeholder="Расскажите о поводе, предпочтениях по цветам или задайте вопрос..."></textarea></div>
+              <button type="submit" class="btn" id="submit-btn">Отправить заявку</button>
+            </form>
+          </div>
+          <div class="form-success" id="form-success">
+            <div class="form-success-icon">✓</div>
+            <h4>Заявка отправлена</h4>
+            <p>Спасибо! Я свяжусь с вами в ближайшее время.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="logo">FLEUR<span style="color: var(--accent);">.</span></div>
+      <p>© 2026 Fleur — Модный бутик цветов. Все права защищены.</p>
+    </div>
+  </footer>
+</div>
+
+<div id="aboutPage" style="display: none;">
+  <section class="about-hero"><div><h1>FLEUR<span style="color: var(--accent-deep);">.</span></h1><p>Создаем цветочные истории с любовью и вниманием к деталям</p></div></section>
+  <section class="about-section">
+    <div class="container">
+      <div class="section-header"><h2>Наша <em>история</em></h2><p>Fleur — это больше, чем просто цветочный бутик. Это место, где рождаются эмоции и создаются воспоминания.</p></div>
+      <div class="about-grid">
+        <div class="about-item"><svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781656141_119" width="400" height="500" preserveAspectRatio="xMidYMid slice"/></svg><div class="about-text"><h3>Свежие цветы</h3><p>Работаем только с проверенными поставщиками. Каждый букет собирается из свежайших цветов, которые доставляются к нам каждое утро.</p></div></div>
+        <div class="about-item"><svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5393277355595340452_121" width="400" height="500" preserveAspectRatio="xMidYMid slice"/></svg><div class="about-text"><h3>Авторский подход</h3><p>Наши флористы — настоящие художники. Каждый букет — это уникальная композиция, созданная с душой и вниманием к деталям.</p></div></div>
+        <div class="about-item"><svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5393277355595340451_121" width="400" height="500" preserveAspectRatio="xMidYMid slice"/></svg><div class="about-text"><h3>Быстрая доставка</h3><p>Доставляем букеты по всему городу за 2 часа. Бережная упаковка и специальные термобоксы гарантируют свежесть цветов.</p></div></div>
+        <div class="about-item"><svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5393277355595340455_121" width="400" height="500" preserveAspectRatio="xMidYMid slice"/></svg><div class="about-text"><h3>Композиции</h3><p>Создаем не только букеты, но и цветочные композиции в коробках, корзинах и кашпо для вашего интерьера.</p></div></div>
+        <div class="about-item"><svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5393277355595340479_121" width="400" height="500" preserveAspectRatio="xMidYMid slice"/></svg><div class="about-text"><h3>Сезонные цветы</h3><p>Следим за трендами и предлагаем самые актуальные сезонные композиции. От весенних тюльпанов до зимних амариллисов.</p></div></div>
+        <div class="about-item"><svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg"><image href="https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5393277355595340480_119" width="400" height="500" preserveAspectRatio="xMidYMid slice"/></svg><div class="about-text"><h3>Индивидуальный подход</h3><p>Помогаем выбрать идеальный букет для любого повода. Учитываем все пожелания и создаем персональные композиции.</p></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="cartModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCart()">×</button>
+    <h3>Ваша корзина</h3>
+    <p>Проверьте состав заказа перед оформлением</p>
+    <div id="cartContent"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal" style="max-width: 680px;">
+    <button class="modal-close" onclick="closeCheckout()">×</button>
+    
+    <div id="checkoutForm">
+      <div class="checkout-steps">
+        <div class="checkout-step active" data-step="1"></div>
+        <div class="checkout-step" data-step="2"></div>
+        <div class="checkout-step" data-step="3"></div>
+      </div>
+      
+      <div class="checkout-section active" data-section="1">
+        <h4>Контактные данные</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ваше имя *</label>
+            <input type="text" id="co-name" required placeholder="Анна" />
+            <div class="error-message" id="co-name-error">Введите корректное имя (минимум 2 буквы)</div>
+          </div>
+          <div class="form-group">
+            <label>Телефон *</label>
+            <input type="tel" id="co-phone" required placeholder="+7 (___) ___-__-__" />
+            <div class="error-message" id="co-phone-error">Введите полный номер телефона</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Предпочтительный мессенджер *</label>
+          <div class="messenger-options">
+            <div class="messenger-option selected" data-messenger="telegram" onclick="selectMessenger(this)">
+              <div class="messenger-option-icon">✈️</div>
+              <div class="messenger-option-title">Telegram</div>
+            </div>
+            <div class="messenger-option" data-messenger="whatsapp" onclick="selectMessenger(this)">
+              <div class="messenger-option-icon">💬</div>
+              <div class="messenger-option-title">WhatsApp</div>
+            </div>
+            <div class="messenger-option" data-messenger="max" onclick="selectMessenger(this)">
+              <div class="messenger-option-icon">📱</div>
+              <div class="messenger-option-title">MAX</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn" onclick="nextCheckoutStep(2)" style="width: 100%;">Далее: доставка</button>
+      </div>
+      
+      <div class="checkout-section" data-section="2">
+        <h4>Доставка</h4>
+        <div class="delivery-options">
+          <div class="delivery-option selected" data-type="courier" onclick="selectDelivery(this)">
+            <div class="delivery-option-icon"></div>
+            <div class="delivery-option-title">Курьером</div>
+            <div class="delivery-option-desc">По городу</div>
+          </div>
+          <div class="delivery-option" data-type="pickup" onclick="selectDelivery(this)">
+            <div class="delivery-option-icon">🏪</div>
+            <div class="delivery-option-title">Самовывоз</div>
+            <div class="delivery-option-desc">ул. Цветочная, 12</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Город *</label>
+            <select id="co-city">
+              <option value="Чебоксары">Чебоксары</option>
+              <option value="Канаш">Канаш</option>
+              <option value="Новочебоксарск">Новочебоксарск</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Дата доставки *</label>
+            <input type="date" id="co-date" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Желаемое время доставки</label>
+          <input type="text" id="co-time" placeholder="Например: 14:00 - 16:00" />
+        </div>
+        <div class="form-group" id="address-group">
+          <label>Адрес доставки *</label>
+          <input type="text" id="co-address" placeholder="ул. Примерная, д. 1, кв. 10" />
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="co-later" onchange="toggleLaterFields()" />
+          <label for="co-later">Дата, время или адрес будут согласованы с менеджером позже</label>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+          <button class="btn-outline" onclick="prevCheckoutStep(1)" style="flex: 1; min-width: 120px;">Назад</button>
+          <button class="btn" onclick="nextCheckoutStep(3)" style="flex: 2; min-width: 160px;">Далее: получатель</button>
+        </div>
+      </div>
+      
+      <div class="checkout-section" data-section="3">
+        <h4>Получатель и детали</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Имя получателя</label>
+            <input type="text" id="co-recipient" placeholder="Кому дарим?" />
+          </div>
+          <div class="form-group">
+            <label>Телефон получателя</label>
+            <input type="tel" id="co-recipient-phone" placeholder="+7 (___) ___-__-__" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Текст открытки</label>
+          <textarea id="co-card-text" placeholder="Тёплые слова для получателя..." style="min-height: 80px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Комментарий к заказу</label>
+          <textarea id="co-comment" placeholder="Особые пожелания, аллергии, предпочтения..." style="min-height: 80px;"></textarea>
+        </div>
+        
+        <div class="order-summary" id="checkoutSummary"></div>
+        
+        <div class="cart-note">
+          💡 Итоговая стоимость (включая доставку) будет подтверждена менеджером после проверки наличия цветов и адреса доставки.
+        </div>
+        
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn-outline" onclick="prevCheckoutStep(2)" style="flex: 1; min-width: 120px;">Назад</button>
+          <button class="btn" onclick="submitOrder()" style="flex: 2; min-width: 160px;">Оформить заказ</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="checkoutSuccess" style="display: none;">
+      <div class="order-success-icon">✓</div>
+      <div class="order-number" id="successOrderNumber"></div>
+      <div style="text-align: center;">
+        <span class="order-status-badge" id="orderStatusBadge">Ожидает оплаты</span>
+      </div>
+      <h3 style="text-align: center; margin-bottom: 12px;">Заказ оформлен!</h3>
+      <p style="text-align: center; color: var(--text-soft); margin-bottom: 24px;">
+        Оплатите заказ онлайн или свяжитесь с менеджером для подтверждения
+      </p>
+      
+      <!-- Кнопка оплаты ЮKassa -->
+      <button class="btn-yookassa pay-button" id="payButton" onclick="initiatePayment()" style="width: 100%; margin-bottom: 16px;">
+        💳 Оплатить заказ онлайн
+      </button>
+      
+      <div class="hint-box">
+        <strong>Безопасная оплата через ЮKassa</strong><br>
+        После нажатия кнопки вы будете перенаправлены на защищённую страницу оплаты. Принимаем карты МИР, Visa, Mastercard и СБП.
+      </div>
+      
+      <div class="hint-box" style="border-left-color: var(--sage); background: var(--bg);">
+        <strong>Следующий шаг:</strong> выберите удобный мессенджер и отправьте менеджеру детали заказа. Менеджер подтвердит наличие цветов, адрес, дату и итоговую стоимость.
+      </div>
+      
+      <div class="messenger-buttons" id="messengerButtons"></div>
+      
+      <button class="copy-btn" onclick="copyOrderMessage()">📋 Скопировать текст заказа</button>
+      
+      <div class="next-steps">
+        <h4>Что будет дальше:</h4>
+        <ol>
+          <li>Оплатите заказ через ЮKassa</li>
+          <li>Отправьте сообщение менеджеру</li>
+          <li>Менеджер подтвердит наличие цветов</li>
+          <li>Подтвердит адрес, дату и стоимость доставки</li>
+          <li>Отправит инструкции по получению</li>
+        </ol>
+      </div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+        <button class="btn-outline" onclick="closeCheckout(); showPage('home');" style="flex: 1; min-width: 120px;">В каталог</button>
+        <button class="btn" onclick="closeCheckout(); scrollToContacts();" style="flex: 1; min-width: 120px;">К контактам</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== КОНФИГУРАЦИЯ =====
+const MANAGER_CONFIG = {
+  telegram: { username: 'fleur_manager', link: 'https://t.me/fleur_manager' },
+  whatsapp: { phone: '79991234567', link: 'https://wa.me/79991234567' },
+  max: { username: 'fleur_shop', link: 'https://max.ru/fleur_shop' }
+};
+
+const DELIVERY_CONFIG = {
+  cities: ['Чебоксары', 'Канаш', 'Новочебоксарск'],
+  courierPrice: 'от 300 ₽ (уточняется по адресу)',
+  pickupPrice: 'Бесплатно',
+  note: 'Точная стоимость доставки зависит от адреса и будет подтверждена менеджером'
+};
+
+const TELEGRAM_BOT_TOKEN = '8712931552:AAGilnxTtpCwE9COCp1AxyTT4M9Tf0qJbQE';
+const TELEGRAM_CHAT_ID = '7196676689';
+
+// Текущий заказ (для оплаты)
+let currentOrderData = null;
+
+// ===== КАТАЛОГ =====
+const catalogData = {
+  popular: [
+    { name: 'Нежность', desc: 'Пионовидные розы, эвкалипт, матиола', price: 3500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655854_121' },
+    { name: 'Весеннее утро', desc: 'Тюльпаны, фрезия, питтоспорум', price: 4200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655855_119' },
+    { name: 'Розовая дымка', desc: 'Розы, ранункулюсы, гипсофила', price: 5500, img: 'https://images.unsplash.com/photo-1487530811176-3780de880c2d?w=600&q=80' },
+    { name: 'Утро в Провансе', desc: 'Лаванда, гортензия, эустома', price: 6800, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655862_119' },
+    { name: 'Композиция «Пастель»', desc: 'Авторская композиция в шляпной коробке', price: 7500, img: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=600&q=80' }
+  ],
+  composite: [
+    { name: 'Садовая мечта', desc: 'Пионы, розы, эвкалипт, лаванда', price: 6900, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655876_119' },
+    { name: 'Летний микс', desc: 'Ромашки, герберы, альстромерия', price: 4800, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655878_119' },
+    { name: 'Яркий микс', desc: 'Хризантемы, розы, статица', price: 5200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655879_119' },
+    { name: 'Французский шик', desc: 'Ранункулюсы, эустома, фрезия', price: 7200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655886_119' },
+    { name: 'Романтика', desc: 'Розы, пионы, матиола', price: 6500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655887_119' }
+  ],
+  mono: [
+    { name: 'Моно пионы', desc: '25 пионов Sarah Bernhardt', price: 8900, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655890_119' },
+    { name: 'Моно тюльпаны', desc: '25 розовых тюльпанов', price: 3800, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655894_119' },
+    { name: 'Моно розы', desc: '25 красных роз Premium', price: 7500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655897_119' },
+    { name: 'Моно ранункулюсы', desc: '21 ранункулюс', price: 5900, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655898_119' },
+    { name: 'Моно ирисы', desc: '25 фиолетовых ирисов', price: 4200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655900_119' }
+  ],
+  wow: [
+    { name: 'Премиум микс', desc: 'Орхидеи, пионы, розы, эвкалипт', price: 12500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655901_119' },
+    { name: 'Королевский', desc: '101 роза, премиум упаковка', price: 25000, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655905_119' },
+    { name: 'Шоколадный букет', desc: 'Розы + конфеты ручной работы', price: 9800, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655906_119' },
+    { name: 'Авторский XXL', desc: 'Эксклюзивная композиция 80 см', price: 15000, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655909_119' },
+    { name: 'Золотой букет', desc: 'Пионы + золотое напыление', price: 11500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655910_119' }
+  ],
+  composition: [
+    { name: 'Композиция в корзине', desc: 'Пионы, розы, эвкалипт', price: 8500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655912_119' },
+    { name: 'Композиция в шляпной коробке', desc: 'Ранункулюсы, эустома', price: 7500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655915_119' },
+    { name: 'Композиция в вазе', desc: 'Тюльпаны, фрезия, зелень', price: 5200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655916_119' },
+    { name: 'Композиция на подносе', desc: 'Гортензия, лаванда, эвкалипт', price: 6800, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655917_119' },
+    { name: 'Композиция в кашпо', desc: 'Розы, пионы, зелень', price: 9200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655922_119' }
+  ],
+  compliment: [
+    { name: 'Мини пионы', desc: '5 пионов в упаковке', price: 1800, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655925_119' },
+    { name: 'Мини тюльпаны', desc: '7 тюльпанов', price: 1500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655927_119' },
+    { name: 'Мини розы', desc: '7 кустовых роз', price: 1900, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655930_119' },
+    { name: 'Мини ранункулюсы', desc: '5 ранункулюсов', price: 2200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655931_119' },
+    { name: 'Мини микс', desc: 'Небольшой микс цветов', price: 2500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655937_119' }
+  ],
+  wedding: [
+    { name: 'Свадебный классика', desc: 'Пионы, розы, эвкалипт', price: 9500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655939_119' },
+    { name: 'Свадебный нежный', desc: 'Ранункулюсы, эустома', price: 8200, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655943_119' },
+    { name: 'Свадебный прованс', desc: 'Лаванда, гортензия, эустома', price: 7800, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655951_119' },
+    { name: 'Свадебный романтика', desc: 'Розы, пионы, матиола', price: 10500, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655968_119' },
+    { name: 'Свадебный премиум', desc: 'Орхидеи, пионы, розы', price: 15000, img: 'https://res.cloudinary.com/trv7tzzp/image/upload/f_auto,q_auto/5391025555781655971_119' }
+  ]
+};
+
+let cart = [];
+let currentCheckoutStep = 1;
+let checkoutData = { messenger: 'telegram', deliveryType: 'courier', laterConfirm: false };
+
+// ===== КОРЗИНА =====
+function loadCart() {
+  try { const saved = localStorage.getItem('fleur_cart'); if (saved) cart = JSON.parse(saved); } catch(e) { cart = []; }
+  updateCartUI();
+}
+
+function saveCart() {
+  try { localStorage.setItem('fleur_cart', JSON.stringify(cart)); } catch(e) {}
+  updateCartUI();
+}
+
+function addToCart(item) {
+  const existing = cart.find(c => c.name === item.name);
+  if (existing) { existing.qty++; } else { cart.push({ ...item, qty: 1 }); }
+  saveCart();
+  showToast(`«${item.name}» добавлен в корзину`);
+}
+
+function removeFromCart(name) { cart = cart.filter(c => c.name !== name); saveCart(); renderCart(); }
+
+function changeQty(name, delta) {
+  const item = cart.find(c => c.name === name);
+  if (item) {
+    item.qty += delta;
+    if (item.qty <= 0) { removeFromCart(name); return; }
+    saveCart();
+    renderCart();
+  }
+}
+
+function getCartTotal() { return cart.reduce((sum, item) => sum + item.price * item.qty, 0); }
+function getCartCount() { return cart.reduce((sum, item) => sum + item.qty, 0); }
+
+function updateCartUI() {
+  const count = getCartCount();
+  const badge = document.getElementById('cartBadge');
+  const menuCount = document.querySelector('.cart-count-menu');
+  if (count > 0) { badge.textContent = count; badge.classList.remove('hidden'); }
+  else { badge.classList.add('hidden'); }
+  if (menuCount) menuCount.textContent = count;
+  document.querySelectorAll('.add-btn').forEach(btn => {
+    const itemEl = btn.closest('.catalog-item');
+    if (itemEl) {
+      const name = itemEl.querySelector('h3').textContent;
+      const inCart = cart.some(c => c.name === name);
+      btn.classList.toggle('in-cart', inCart);
+      btn.textContent = inCart ? '✓' : '+';
+    }
+  });
+}
+
+function renderCart() {
+  const container = document.getElementById('cartContent');
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🌸</div><p>Корзина пуста</p><p style="font-size: 13px; margin-top: 8px;">Добавьте букеты из каталога</p></div>`;
+    return;
+  }
+  let html = '<div class="cart-items">';
+  cart.forEach(item => {
+    html += `<div class="cart-item">
+      <div class="cart-item-img"><svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="cart-${item.name.replace(/\s/g,'')}"><rect width="300" height="300"/></clipPath></defs><g clip-path="url(#cart-${item.name.replace(/\s/g,'')})"><image href="${item.img}" width="300" height="300" preserveAspectRatio="xMidYMid slice"/></g></svg></div>
+      <div class="cart-item-info"><h4>${item.name}</h4><div class="cart-item-price">${item.price.toLocaleString('ru-RU')} ₽</div></div>
+      <div class="cart-item-controls">
+        <button class="qty-btn" onclick="changeQty('${item.name}', -1)">−</button>
+        <span class="qty-value">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty('${item.name}', 1)">+</button>
+        <button class="cart-remove" onclick="removeFromCart('${item.name}')" title="Удалить">✕</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  html += `<div class="cart-total"><span class="cart-total-label">Предварительная сумма:</span><span class="cart-total-value">${getCartTotal().toLocaleString('ru-RU')} ₽</span></div>
+    <div class="cart-note">💡 Итоговая стоимость будет подтверждена менеджером после проверки наличия цветов</div>
+    <button class="btn" onclick="startCheckout()" style="width: 100%;">Оформить заказ</button>
+    <button class="btn-outline" onclick="closeCart()" style="width: 100%; margin-top: 10px; text-align: center;">Продолжить покупки</button>`;
+  container.innerHTML = html;
+}
+
+function openCart() { renderCart(); document.getElementById('cartModal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeCart() { document.getElementById('cartModal').classList.remove('open'); document.body.style.overflow = ''; }
+
+// ===== ОФОРМЛЕНИЕ ЗАКАЗА =====
+function startCheckout() {
+  if (cart.length === 0) { showToast('Корзина пуста'); return; }
+  closeCart();
+  currentCheckoutStep = 1;
+  updateCheckoutSteps();
+  document.getElementById('checkoutForm').style.display = 'block';
+  document.getElementById('checkoutSuccess').style.display = 'none';
+  document.getElementById('checkoutModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('co-date').min = today;
+  document.getElementById('co-date').value = today;
+}
+
+function closeCheckout() { document.getElementById('checkoutModal').classList.remove('open'); document.body.style.overflow = ''; }
+
+function updateCheckoutSteps() {
+  document.querySelectorAll('.checkout-step').forEach((step, idx) => {
+    const stepNum = idx + 1;
+    step.classList.remove('active', 'done');
+    if (stepNum === currentCheckoutStep) step.classList.add('active');
+    else if (stepNum < currentCheckoutStep) step.classList.add('done');
+  });
+  document.querySelectorAll('.checkout-section').forEach(section => section.classList.remove('active'));
+  document.querySelector(`.checkout-section[data-section="${currentCheckoutStep}"]`).classList.add('active');
+  if (currentCheckoutStep === 3) renderCheckoutSummary();
+}
+
+function validateName(name) { return /^[a-zA-Zа-яА-ЯёЁ\s\-]{2,}$/.test(name.trim()); }
+function validatePhone(phone) { return phone.replace(/\D/g, '').length === 11; }
+
+function clearErrors() {
+  document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+  document.querySelectorAll('input, textarea, select').forEach(el => el.classList.remove('error'));
+}
+
+function showError(fieldId, errorId) {
+  const field = document.getElementById(fieldId);
+  const error = document.getElementById(errorId);
+  if (field) field.classList.add('error');
+  if (error) error.classList.add('show');
+}
+
+function nextCheckoutStep(step) {
+  clearErrors();
+  if (step === 2) {
+    const name = document.getElementById('co-name').value.trim();
+    const phone = document.getElementById('co-phone').value.trim();
+    let valid = true;
+    if (!name || !validateName(name)) { showError('co-name', 'co-name-error'); valid = false; }
+    if (!phone || !validatePhone(phone)) { showError('co-phone', 'co-phone-error'); valid = false; }
+    if (!valid) { showToast('Пожалуйста, исправьте ошибки в форме', true); return; }
+  }
+  if (step === 3) {
+    const date = document.getElementById('co-date').value;
+    const deliveryType = document.querySelector('.delivery-option.selected')?.dataset.type;
+    const laterConfirm = document.getElementById('co-later').checked;
+    if (!date && !laterConfirm) { showToast('Пожалуйста, выберите дату доставки'); return; }
+    if (deliveryType === 'courier' && !laterConfirm) {
+      const address = document.getElementById('co-address').value.trim();
+      if (!address) { showToast('Пожалуйста, укажите адрес доставки'); return; }
+    }
+  }
+  currentCheckoutStep = step;
+  updateCheckoutSteps();
+}
+
+function prevCheckoutStep(step) { clearErrors(); currentCheckoutStep = step; updateCheckoutSteps(); }
+function selectMessenger(el) { document.querySelectorAll('.messenger-option').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); checkoutData.messenger = el.dataset.messenger; }
+function selectDelivery(el) {
+  document.querySelectorAll('.delivery-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  checkoutData.deliveryType = el.dataset.type;
+  const addressGroup = document.getElementById('address-group');
+  if (el.dataset.type === 'pickup') { addressGroup.style.opacity = '0.5'; addressGroup.style.pointerEvents = 'none'; }
+  else { addressGroup.style.opacity = '1'; addressGroup.style.pointerEvents = 'auto'; }
+}
+function toggleLaterFields() { checkoutData.laterConfirm = document.getElementById('co-later').checked; }
+
+function renderCheckoutSummary() {
+  const summary = document.getElementById('checkoutSummary');
+  let html = '<h4 style="margin-bottom: 12px; font-size: 18px;">Ваш заказ</h4>';
+  cart.forEach(item => { html += `<div class="order-summary-row"><span class="label">${item.name} × ${item.qty}</span><span class="value">${(item.price * item.qty).toLocaleString('ru-RU')} ₽</span></div>`; });
+  html += `<div class="order-summary-row total"><span class="label">Стоимость товаров:</span><span class="value">${getCartTotal().toLocaleString('ru-RU')} ₽</span></div>
+    <div class="order-summary-row"><span class="label">Доставка:</span><span class="value">${checkoutData.deliveryType === 'pickup' ? 'Самовывоз (бесплатно)' : 'Уточняется менеджером'}</span></div>`;
+  summary.innerHTML = html;
+}
+
+function generateOrderNumber() {
+  const date = new Date();
+  const random = Math.floor(Math.random() * 9000 + 1000);
+  return `FL-${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}-${random}`;
+}
+
+// ===== ОТПРАВКА ЗАКАЗА + ЮKASSA =====
+function submitOrder() {
+  const orderNumber = generateOrderNumber();
+  const orderData = {
+    number: orderNumber,
+    date: new Date().toISOString(),
+    status: 'pending_payment',
+    customer: {
+      name: document.getElementById('co-name').value.trim(),
+      phone: document.getElementById('co-phone').value.trim(),
+      messenger: checkoutData.messenger
+    },
+    delivery: {
+      type: checkoutData.deliveryType,
+      city: document.getElementById('co-city').value,
+      date: document.getElementById('co-date').value,
+      time: document.getElementById('co-time').value.trim(),
+      address: document.getElementById('co-address').value.trim(),
+      laterConfirm: checkoutData.laterConfirm
+    },
+    recipient: {
+      name: document.getElementById('co-recipient').value.trim(),
+      phone: document.getElementById('co-recipient-phone').value.trim()
+    },
+    cardText: document.getElementById('co-card-text').value.trim(),
+    comment: document.getElementById('co-comment').value.trim(),
+    items: [...cart],
+    total: getCartTotal()
+  };
+
+  // Сохраняем заказ локально
+  try {
+    const orders = JSON.parse(localStorage.getItem('fleur_orders') || '[]');
+    orders.push(orderData);
+    localStorage.setItem('fleur_orders', JSON.stringify(orders));
+  } catch(e) { console.error('Ошибка сохранения:', e); }
+
+  // Сохраняем текущий заказ для оплаты
+  currentOrderData = orderData;
+
+  // Показываем экран успеха
+  document.getElementById('checkoutForm').style.display = 'none';
+  document.getElementById('checkoutSuccess').style.display = 'block';
+  document.getElementById('successOrderNumber').textContent = `Заказ №${orderNumber}`;
+  
+  // Сбросить статус на "ожидает оплаты"
+  const badge = document.getElementById('orderStatusBadge');
+  badge.textContent = 'Ожидает оплаты';
+  badge.classList.remove('paid');
+  
+  // Сбросить кнопку оплаты
+  const payBtn = document.getElementById('payButton');
+  payBtn.disabled = false;
+  payBtn.textContent = '💳 Оплатить заказ онлайн';
+  payBtn.style.display = 'block';
+
+  renderMessengerButtons(orderData);
+
+  cart = [];
+  saveCart();
+
+  // Уведомление в Telegram о новом заказе
+  try {
+    const itemsList = orderData.items.map(i => `• ${i.name} × ${i.qty} — ${(i.price * i.qty).toLocaleString('ru-RU')} ₽`).join('\n');
+    const telegramText = `🌸 *НОВЫЙ ЗАКАЗ #${orderNumber}*\n\n👤 *Клиент:* ${orderData.customer.name}\n📱 *Телефон:* ${orderData.customer.phone}\n💬 *Мессенджер:* ${orderData.customer.messenger}\n\n📦 *Состав заказа:*\n${itemsList}\n\n💰 *Стоимость товаров:* ${orderData.total.toLocaleString('ru-RU')} ₽\n🚚 *Доставка:* ${orderData.delivery.type === 'pickup' ? 'Самовывоз' : 'Курьер'}\n📍 *Город:* ${orderData.delivery.city}\n📅 *Дата:* ${orderData.delivery.date || 'уточняется'}\n🕐 *Время:* ${orderData.delivery.time || 'уточняется'}\n🏠 *Адрес:* ${orderData.delivery.address || 'уточняется'}\n\n🎁 *Получатель:* ${orderData.recipient.name || 'не указан'}\n📞 *Тел. получателя:* ${orderData.recipient.phone || 'не указан'}\n\n💌 *Текст открытки:* ${orderData.cardText || '—'}\n📝 *Комментарий:* ${orderData.comment || '—'}\n\n💳 *Оплата:* ожидает оплаты через ЮKassa\n⏳ *Статус:* новый заказ`;
+    
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(telegramText)}&parse_mode=Markdown`;
+    fetch(url).catch(err => console.error('Telegram ошибка:', err));
+  } catch(e) { console.error('Ошибка:', e); }
+}
+
+// ===== ЮKASSA ОПЛАТА =====
+async function initiatePayment() {
+  if (!currentOrderData) {
+    showToast('Данные заказа не найдены', true);
+    return;
+  }
+
+  const payBtn = document.getElementById('payButton');
+  payBtn.disabled = true;
+  payBtn.textContent = '⏳ Создание платежа...';
+
+  try {
+    const response = await fetch('/api/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: currentOrderData.total,
+        orderNumber: currentOrderData.number,
+        description: `Заказ цветов №${currentOrderData.number} — ${currentOrderData.items.map(i => i.name).join(', ')}`,
+        customerEmail: '',
+        customerName: currentOrderData.customer.name,
+        customerPhone: currentOrderData.customer.phone
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.paymentUrl) {
+      // Обновляем статус заказа
+      try {
+        const orders = JSON.parse(localStorage.getItem('fleur_orders') || '[]');
+        const order = orders.find(o => o.number === currentOrderData.number);
+        if (order) {
+          order.status = 'awaiting_payment';
+          order.paymentId = data.paymentId;
+          localStorage.setItem('fleur_orders', JSON.stringify(orders));
+        }
+      } catch(e) { console.error('Ошибка обновления статуса:', e); }
+
+      // Перенаправляем на страницу оплаты ЮKassa
+      window.location.href = data.paymentUrl;
+    } else {
+      throw new Error(data.error || 'Не удалось создать платёж');
+    }
+
+  } catch (error) {
+    console.error('Ошибка оплаты:', error);
+    showToast('Ошибка создания платежа. Попробуйте ещё раз.', true);
+    payBtn.disabled = false;
+    payBtn.textContent = '💳 Оплатить заказ онлайн';
+  }
+}
+
+// ===== СООБЩЕНИЕ МЕНЕДЖЕРУ =====
+function buildOrderMessage(orderData) {
+  const itemsList = orderData.items.map(i => `• ${i.name} × ${i.qty}`).join(', ');
+  return `Здравствуйте! Хочу оформить заказ на цветы.
+
+Номер заказа: ${orderData.number}
+Состав заказа: ${itemsList}
+Стоимость товаров: ${orderData.total.toLocaleString('ru-RU')} ₽
+Доставка: ${orderData.delivery.type === 'pickup' ? 'Самовывоз' : 'Курьер'}
+Город: ${orderData.delivery.city}
+Дата и время: ${orderData.delivery.date || 'уточняется'}${orderData.delivery.time ? ', ' + orderData.delivery.time : ''}
+Адрес: ${orderData.delivery.address || 'уточняется с менеджером'}
+Имя клиента: ${orderData.customer.name}
+Получатель: ${orderData.recipient.name || 'не указан'}${orderData.recipient.phone ? ' (тел: ' + orderData.recipient.phone + ')' : ''}
+Текст открытки: ${orderData.cardText || '—'}
+Пожелания: ${orderData.comment || '—'}
+
+Пожалуйста, подтвердите наличие цветов, возможность доставки и окончательную стоимость заказа.`;
+}
+
+function renderMessengerButtons(orderData) {
+  const container = document.getElementById('messengerButtons');
+  const message = buildOrderMessage(orderData);
+  const telegramUrl = MANAGER_CONFIG.telegram.link;
+  const whatsappUrl = `${MANAGER_CONFIG.whatsapp.link}?text=${encodeURIComponent(message)}`;
+  const maxUrl = MANAGER_CONFIG.max.link;
+  
+  container.innerHTML = `
+    <a href="${telegramUrl}" target="_blank" class="messenger-btn telegram" onclick="onMessengerClick()">✈️ Telegram</a>
+    <a href="${whatsappUrl}" target="_blank" class="messenger-btn whatsapp" onclick="onMessengerClick()">💬 WhatsApp</a>
+    <a href="${maxUrl}" target="_blank" class="messenger-btn max" onclick="onMessengerClick()">📱 MAX</a>
+  `;
+  
+  window._lastOrderMessage = message;
+  window._lastOrderData = orderData;
+}
+
+function onMessengerClick() { setTimeout(() => { showToast('Отправьте подготовленное сообщение менеджеру'); }, 500); }
+
+function copyOrderMessage() {
+  const message = window._lastOrderMessage;
+  if (!message) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(message).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✓ Скопировано!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Скопировать текст заказа'; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => fallbackCopy(message));
+  } else { fallbackCopy(message); }
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✓ Скопировано!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Скопировать текст заказа'; btn.classList.remove('copied'); }, 2000);
+  } catch(e) { showToast('Не удалось скопировать'); }
+  document.body.removeChild(textarea);
+}
+
+function showToast(message, isError = false, isSuccess = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.remove('error', 'success');
+  if (isError) toast.classList.add('error');
+  if (isSuccess) toast.classList.add('success');
+  toast.classList.add('show');
+  setTimeout(() => { toast.classList.remove('show', 'error', 'success'); }, 3000);
+}
+
+// ===== КАТАЛОГ =====
+function renderCatalog() {
+  const grids = { popular: document.getElementById('popularGrid'), composite: document.getElementById('compositeGrid'), mono: document.getElementById('monoGrid'), wow: document.getElementById('wowGrid'), composition: document.getElementById('compositionGrid'), compliment: document.getElementById('complimentGrid'), wedding: document.getElementById('weddingGrid') };
+  Object.keys(catalogData).forEach(category => {
+    const grid = grids[category];
+    if (grid) {
+      catalogData[category].forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'catalog-item reveal';
+        div.innerHTML = `<div class="catalog-image"><svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="cat${category}${index}"><rect width="300" height="300"/></clipPath></defs><g clip-path="url(#cat${category}${index})"><image href="${item.img}" width="300" height="300" preserveAspectRatio="xMidYMid slice"/></g></svg></div><div class="catalog-info"><h3>${item.name}</h3><p class="desc">${item.desc}</p><div class="catalog-bottom"><div class="price">${item.price.toLocaleString('ru-RU')} ₽</div><button class="add-btn" aria-label="Добавить в корзину">+</button></div></div>`;
+        div.addEventListener('click', (e) => { if (!e.target.classList.contains('add-btn')) addToCart(item); });
+        div.querySelector('.add-btn').addEventListener('click', (e) => { e.stopPropagation(); addToCart(item); });
+        grid.appendChild(div);
+      });
+    }
+  });
+}
+
+// ===== СЛАЙДЕР =====
+let currentSlide = 0;
+const totalSlides = 10;
+let slideWidth = 360 + 20;
+
+function getSlideWidth() {
+  if (window.innerWidth <= 560) return window.innerWidth * 0.85 + 20;
+  if (window.innerWidth <= 900) return 300 + 20;
+  return 360 + 20;
+}
+
+function updateSlider() {
+  const track = document.getElementById('sliderTrack');
+  if (!track) return;
+  slideWidth = getSlideWidth();
+  track.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+  document.querySelectorAll('.dot').forEach((dot, i) => { dot.classList.toggle('active', i === currentSlide); });
+}
+function nextSlide() { currentSlide = (currentSlide + 1) % totalSlides; updateSlider(); }
+function prevSlide() { currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; updateSlider(); }
+function goToSlide(index) { currentSlide = index; updateSlider(); }
+
+function initSliderDots() {
+  const dotsContainer = document.getElementById('sliderDots');
+  if (!dotsContainer) return;
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+  }
+}
+
+// ===== НАВИГАЦИЯ =====
+function toggleMenu() { document.getElementById('menuDrawer').classList.toggle('open'); document.querySelector('.menu-overlay').classList.toggle('open'); }
+function toggleSubmenu(id) { document.getElementById(id).classList.toggle('open'); }
+function showPage(page) {
+  if (page === 'home') { document.getElementById('homePage').style.display = 'block'; document.getElementById('aboutPage').style.display = 'none'; window.scrollTo(0, 0); }
+  else if (page === 'about') { document.getElementById('homePage').style.display = 'none'; document.getElementById('aboutPage').style.display = 'block'; window.scrollTo(0, 0); }
+}
+function scrollToCategory(target) { const el = document.getElementById(target); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function scrollToContacts() { const el = document.getElementById('contacts'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+const catPills = document.querySelectorAll('.cat-pill');
+const categorySections = ['popular', 'composite', 'mono', 'wow', 'composition', 'compliment', 'wedding'];
+catPills.forEach(pill => {
+  pill.addEventListener('click', () => {
+    catPills.forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    scrollToCategory(pill.getAttribute('data-target'));
+  });
+});
+
+function updateActivePill() {
+  const scrollPos = window.scrollY + 200;
+  let activeTarget = 'popular';
+  categorySections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollPos) activeTarget = id;
+  });
+  catPills.forEach(pill => { pill.classList.toggle('active', pill.getAttribute('data-target') === activeTarget); });
+}
+window.addEventListener('scroll', updateActivePill);
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Проверка статуса оплаты после возврата с ЮKassa
+  const urlParams = new URLSearchParams(window.location.search);
+  const paymentStatus = urlParams.get('payment');
+  const orderNumber = urlParams.get('order');
+
+  if (paymentStatus === 'success' && orderNumber) {
+    showToast(`✅ Заказ №${orderNumber} успешно оплачен!`, false, true);
+    
+    // Обновляем статус заказа
+    try {
+      const orders = JSON.parse(localStorage.getItem('fleur_orders') || '[]');
+      const order = orders.find(o => o.number === orderNumber);
+      if (order) {
+        order.status = 'paid';
+        order.paidAt = new Date().toISOString();
+        localStorage.setItem('fleur_orders', JSON.stringify(orders));
+      }
+    } catch(e) { console.error('Ошибка обновления статуса:', e); }
+  }
+
+  // Форма контактов
+  const orderForm = document.getElementById('order-form');
+  if (orderForm) {
+    orderForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearErrors();
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const message = document.getElementById('message').value;
+      let valid = true;
+      if (!name || !validateName(name)) { showError('name', 'name-error'); valid = false; }
+      if (!phone || !validatePhone(phone)) { showError('phone', 'phone-error'); valid = false; }
+      if (!valid) { showToast('Пожалуйста, исправьте ошибки в форме', true); return; }
+      
+      const submitBtn = document.getElementById('submit-btn');
+      const originalBtnText = submitBtn.innerText;
+      submitBtn.innerText = 'Отправка...';
+      submitBtn.disabled = true;
+      
+      const text = `🌸 *Новая заявка с сайта Fleur!*\n\n👤 *Имя:* ${name}\n📱 *Телефон:* ${phone}\n💬 *Сообщение:* ${message || 'Не указано'}`;
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+      
+      fetch(url)
+        .then(response => {
+          if (response.ok) {
+            document.getElementById('form-content').style.display = 'none';
+            document.getElementById('form-success').classList.add('show');
+            orderForm.reset();
+            showToast('Заявка успешно отправлена!', false, true);
+          } else { alert('Ошибка отправки. Пожалуйста, свяжитесь с нами по телефону.'); }
+        })
+        .catch(error => { console.error('Ошибка:', error); alert('Ошибка отправки. Пожалуйста, свяжитесь с нами по телефону.'); })
+        .finally(() => { submitBtn.innerText = originalBtnText; submitBtn.disabled = false; });
+    });
+  }
+
+  // Маска телефона
+  const phoneInputs = ['phone', 'co-phone', 'co-recipient-phone'];
+  phoneInputs.forEach(id => {
+    const phoneInput = document.getElementById(id);
+    if (phoneInput) {
+      phoneInput.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.startsWith('8')) v = '7' + v.slice(1);
+        if (!v.startsWith('7')) v = '7' + v;
+        v = v.slice(0, 11);
+        let f = '+7';
+        if (v.length > 1) f += ' (' + v.slice(1, 4);
+        if (v.length >= 4) f += ') ' + v.slice(4, 7);
+        if (v.length >= 7) f += '-' + v.slice(7, 9);
+        if (v.length >= 9) f += '-' + v.slice(9, 11);
+        e.target.value = f;
+      });
+    }
+  });
+
+  // Инициализация
+  renderCatalog();
+  loadCart();
+  initSliderDots();
+  setInterval(nextSlide, 4000);
+  window.addEventListener('resize', updateSlider);
+  const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); }); }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+});
+
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+</script>
+
+</body>
+</html>
